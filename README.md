@@ -247,3 +247,30 @@ Installing BCL Convert
 sudo apt-get install alien 
 sudo alien --to-deb bcl-convert-4.0.3-2.el7.x86_64.rpm 
 sudo dpkg -i bcl-convert_4.0.3-3_amd64.deb
+
+
+Data Archiving Utility
+### Archive and Upload to S3
+
+This utility script is used to compress a project folder, generate a checksum, and upload the archived data to an AWS S3 bucket for long-term storage.
+
+It ensures:
+- Data reproducibility through MD5 checksum tracking
+- Standardized project archiving structure
+- Efficient transfer to cloud storage
+
+#### Usage
+
+```bash
+bash scripts/archive_to_s3.sh <folder_name>
+```
+Output
+.tar archive of the folder
+.md5sum checksum file
+Upload to S3 under year-based directory structure
+Requirements
+AWS CLI configured (aws configure)
+Write access to S3 bucket
+
+
+
