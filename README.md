@@ -151,3 +151,13 @@ grep "protein_coding" | \
 awk '{if ($3 =="gene") print $0}' | \
 wc -l
 ```
+
+---
+
+for downsampling 
+•	Down sample the fastqs such as in each condition/fastq file I have the same number of reads. For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
+Command: 
+ls *.fastq.gz | parallel -j 4 'seqtk sample -s1000 {} down_sample_value1 > ds/{}.fastq'
+•	Check if down-sampling went well. (Run this command from ds folder)
+Command: 
+for i in `ls *.fastq` ; do echo $(cat ${i} | wc -l)/4|bc; done 
