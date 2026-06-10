@@ -274,3 +274,37 @@ Write access to S3 bucket
 
 
 
+Samtools view bam |wc -l -> give the total number of aligned reads
+And 
+Samtools view bam | grep "chromosome name"|wc -l  -> give the total number of aligned reads for this particular chromosome
+
+
+multiqc
+
+	•	Create a fastqc output folder
+mkdir fastqc_out
+	•	Run fastqc on fastqs
+fastqc -o fastqc_out -t 6 *.gz
+	•	Run multiqc inside the fastq folder 
+multiqc -o output_folder input_folder
+[when u run multiqc on fastp files the input folder is where the html files are and not filtered folder]
+
+
+ 
+fastp
+ls *_R1_001.fastq.gz | parallel -j 5 'R1={} \
+  R2=${R1%_R1_001.fastq.gz}_R2_001.fastq.gz \
+  H=${R1%_R1_001.fastq.gz}_fastp.html \
+  J=${R1%_R1_001.fastq.gz}_fastp.json; \
+  fastp --in1 $R1 --in2 $R2 \
+  --out1 filtered/$R1 --out2 filtered/$R2 \
+  --verbose --detect_adapter_for_pe --length_required 99 \
+  --html $H --json $J && echo "Completed quality filtering for $H"';
+
+
+get primary alignments from bam files
+ls *.bam | parallel -j 4 'bam={} file=${bam%.bam}.bam; samtools view -@20 -b -f 3 -F 2816 $bam > primary_alignments/$file'
+
+
+coverage task 
+ls *.bam | parallel -j 20 'in={} out=${in%.bam}_genome_coverage_max.txt; bedtools genomecov -ibam $in  > max_cov_human/$out && echo "Completed genome coverage for file "$in'
