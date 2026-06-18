@@ -156,15 +156,18 @@ wc -l
 
 # For down-sampling 
 
-Down sample the fastqs such as in each condition/fastq file I have the same number of reads. 
-For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
+First, get the lowest reads count between fastqs before down-sampling
+```bash
+ls ./*.fastq.gz | parallel -j 20 'zcat {} | echo {} $((`wc -l`/4))' | awk '{print $2}' | sort | sed -n '1s/^/min=/p' 
+```
 
+Down-sample the fastqs such as in each condition/fastq file I have the same number of reads. 
+For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
 ```bash
 ls *.fastq.gz | parallel -j 4 'seqtk sample -s1000 {} down_sample_value1 > ds/{}.fastq'
 ```
 
 Check if down-sampling went well. (Run this command from ds folder)
-
 ```bash
 for i in `ls *.fastq` ; do echo $(cat ${i} | wc -l)/4|bc; done 
 ```
@@ -175,12 +178,11 @@ for i in `ls *.fastq` ; do echo $(cat ${i} | wc -l)/4|bc; done
 
 Data folder location: s3://scrippsresearchngscore-jumpcodegenomicslab/ca_ns_0138_01_0120_0010_ordoukhanian_01_RS-SR0-01-HU0.fastqs.tar
 Download the MD5 folder: s3://scrippsresearchngscore-jumpcodegenomicslab/md5/
-
 ```bash
 aws s3 cp path_to_file_to_be_moved path_to_destination
 ```
 
-Md5 file has an integrity value (md5 value). First thing is to check that the tar file and the tar.md5 file have the same md5 value before proceeding to the analysis. 
+Md5 file has an integrity value (md5 value). First, check that the tar file and the tar.md5 file have the same md5 value before proceeding to the analysis. 
 By cating the tar.md5 file, you'll see its md5 value and by md5sum the tar file, you'll see its md5 value. 
 You need to check that these 2 values are equal. If not, something went wrong with the download of the files.
 
