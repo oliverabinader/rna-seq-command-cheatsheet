@@ -156,20 +156,26 @@ wc -l
 
 # For down-sampling 
 
-First, get the lowest reads count between fastqs before down-sampling
+First, get the lowest reads count between fastqs before down-sampling:
 ```bash
 ls ./*.fastq.gz | parallel -j 20 'zcat {} | echo {} $((`wc -l`/4))' | awk '{print $2}' | sort | sed -n '1s/^/min=/p' 
 ```
 
-Down-sample the fastqs such as in each condition/fastq file I have the same number of reads. 
-For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
+Down-sample the fastqs such as in each condition/fastq file I have the same number of reads.
+For that, create ds a "down-sampling" folder in fastq folder and down-sample all fastq files (Run this from inside the fastq folder):
 ```bash
+mkdir ds/
 ls *.fastq.gz | parallel -j 4 'seqtk sample -s1000 {} down_sample_value1 > ds/{}.fastq'
 ```
 
-Check if down-sampling went well. (Run this command from ds folder)
+Check if down-sampling went well (Run this from inside ds folder).
 ```bash
 for i in `ls *.fastq` ; do echo $(cat ${i} | wc -l)/4|bc; done 
+```
+
+Change the extension of down-sampled fastq files.
+```bash
+for f in *.fastq.gz.fastq; do mv -- "$f" "${f%.fastq.gz.fastq}.fastq"; done
 ```
 
 ---
@@ -321,9 +327,14 @@ To get the total number of aligned reads:
 samtools view bam | wc -l
 ```
 
-To get the total number of aligned reads for this particular chromosome:
+To get the total number of aligned reads for a particular chromosome:
 ```bash
 samtools view bam | grep "chromosome name" | wc -l 
+```
+
+To extract reads from bams that align say to chromosome 21:
+```bash
+ls *.bam | parallel -j 10 'in={} out=${in%.bam}_chr21.bam; samtools view -h $bam NC_000021.9 | samtools view -bS - > chr21/$out'
 ```
 
 To get primary alignments from bam files:
@@ -353,6 +364,22 @@ To get genome coverage from the bam files:
 ```bash
 ls *.bam | parallel -j 20 'in={} out=${in%.bam}_genome_coverage_max.txt; bedtools genomecov -ibam $in  > max_cov_human/$out && echo "Completed genome coverage for file "$in'
 ```
+
+To get gene counting for multiple BAM files:
+```bash
+mkdir counts/
+ls *.bam | parallel -j 4 'bam={} out=${bam%.bam}.sample out1=${bam%.bam}.counts; echo $bam > counts/$out | \
+bedtools coverage -a /path/to/protein-coding-ensembl.gtf -b $bam > counts/$out1 | cat counts/$out1 | cut -f 10 >> counts/$out' 
+```
+
+To get depth of coverage:
+```bash
+ls *.bam | parallel -j 3 'bam={} out=${bam%.bam}_cov-depth.txt; bedtools coverage -a /path/to/bed -b $bam -d > $out && echo "Completed estimating coverage depth for $bam"'
+```
+
+To get breadth of coverage:
+```bash
+ls *.bam | parallel -j 3 'bam={} out=${bam%.bam}_cov-breadth.txt; bedtools coverage -a /path/to/bed -b $bam > $out && echo "Completed estimating coverage breadth for $bam"'
 
 •	fastp
 ```bash
@@ -392,3 +419,21 @@ You will need to upload to S3 under year-based directory structure.
 Requirements:
 - AWS CLI configured (aws configure)
 - Write access to S3 bucket
+
+---
+
+# IGV plot
+
+Filter reads from original BAM files aligning to mitochondrial genes
+```bash
+ls *.bam | parallel -j 10 'in={} out=${in%.bam}_mito.bam; samtools view -L GCF_000001405.39_GRCh38.p13_genomic.mito.bed -b $in -o $out && echo "Completed filtering mito reads for $in"' 
+```
+
+Index BAM files 
+```bash
+ls *_mito.bam | parallel -j 16 'samtools index {}'
+```
+
+Copy resulting BAM and BAI files to local PC
+
+Go to IGV browser and upload the BAM files as tracks.
