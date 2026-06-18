@@ -154,144 +154,199 @@ wc -l
 
 ---
 
-for downsampling 
-•	Down sample the fastqs such as in each condition/fastq file I have the same number of reads. For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
-Command: 
+# For down-sampling 
+
+Down sample the fastqs such as in each condition/fastq file I have the same number of reads. 
+For that, create ds a "down-sampling" folder in fastq folder and move all fastq files in ds folder. (Run this command from fastq folder)
+
+```bash
 ls *.fastq.gz | parallel -j 4 'seqtk sample -s1000 {} down_sample_value1 > ds/{}.fastq'
-•	Check if down-sampling went well. (Run this command from ds folder)
-Command: 
+```
+
+Check if down-sampling went well. (Run this command from ds folder)
+
+```bash
 for i in `ls *.fastq` ; do echo $(cat ${i} | wc -l)/4|bc; done 
+```
 
+---
 
-•	Download data from S3 bucket to an EC2 instance:
+# Download data from S3 bucket to an EC2 instance
+
 Data folder location: s3://scrippsresearchngscore-jumpcodegenomicslab/ca_ns_0138_01_0120_0010_ordoukhanian_01_RS-SR0-01-HU0.fastqs.tar
 Download the MD5 folder: s3://scrippsresearchngscore-jumpcodegenomicslab/md5/
-Command:
+
+```bash
 aws s3 cp path_to_file_to_be_moved path_to_destination
- Md5 file has an integrity value (md5 value). First thing is to check that the tar file and the tar.md5 file have the same md5 value before proceeding to the analysis. By cating the tar.md5 file, you'll see its md5 value and by md5sum the tar file, you'll see its md5 value. You need to check that these 2 values are equal. If not, something went wrong with the download of the files.
+```
 
+Md5 file has an integrity value (md5 value). First thing is to check that the tar file and the tar.md5 file have the same md5 value before proceeding to the analysis. 
+By cating the tar.md5 file, you'll see its md5 value and by md5sum the tar file, you'll see its md5 value. 
+You need to check that these 2 values are equal. If not, something went wrong with the download of the files.
 
-Bash commands
-•	Tmux:
-•	To open a screen-like session in the server or the terminal 
-        Command: 
-        tmux new -s session_name      
-•	To see what are the available sessions
-Tmux ls 
-•	To view the session again
-        Command: 
-        tmux attach -t session_name  
-•	To get out from the session
-        control+b then hit d
-•	To kill session at any time
+---
+
+# Some Bash commands
+
+•	tmux:
+
+To open a screen-like session in the server or the terminal:
+```bash
+tmux new -s session_name      
+```
+
+To see what are the available sessions:
+```bash
+Tmux ls
+```
+ 
+To view the session again
+```bash
+tmux attach -t session_name
+```
+
+To get out from the session
+control+b then hit d
+
+To kill session at any time
+```bash
 tmux kill-session -t session_name  
- 
-•	Parallel:
-•	How to gunzip many files in parallel?
+ ```
+
+•	parallel:
+
+How to gunzip many files in parallel?
+```bash
 ls *.fastq.gz | parallel -j 4 'gunzip {}'
-•	Htop:
-•	check if anyone else is running any processes
-•	Scp:
-•	Moving from the server to locally:
-•	scp -i path_pem_file ubuntu@instance_ip:path_file_to_be_moved path_to_destination renaming_file_to_be_moved 
-Example: scp -i jumpcode-bifx.pem ubuntu@52.24.133.64:/mnt/data/references/hg38/star/ensembl-ref/protein-coding-genes.gtf ./
-	Moving from local to server:
-	scp -i path_pem_file path_file_to_be_moved ubuntu@instance_ip:path_to_destination 
-Example: scp -i sridhar-jumpcode.pem /Users/oliver.a/Downloads/protein-coding-genes.gtf ubuntu@13.52.190.191:/mnt/data/references/hg38/ensembl_human-genome/protein-coding-genes.gtf
-Example: 
-	Moving things between 2 instances:
-	scp -i path_pem_file ubuntu@instance_ip:file_to_be_moved path_to_destination
-Example: scp -i ../../AWS_keys/sridhar-jumpcode.pem  ubuntu@13.52.50.144:/mnt/data/basespace/stanPool_NE092-93_TimenTemp/depletion/depletion_output/guidecount/guide_count_metrics.txt ./
-From 144 to 64 instance: run this command on 64 instance
-scp -i /mnt/data/basespace/sridhar-jumpcode.pem [pem key of 144] ubuntu@13.52.50.144:/mnt/data/basespace/220810_A01255_0164_AHFHYGDMXY/NovaSeq-r2-08122022/depletion_output/exo_plots/de-dup/ds_20000000/coverage/157-untreated-500-T1_S58_dedup_L001_non_ALU_coverage.txt /mnt/data/basespace/NovaSeq-r2-08122022/non_clinical/
- 
-FROM 64 TO 121 instance:
-64 to 121: run in 121
-scp -r -i /mnt/data/basespace/jumpcode-bifx.pem ubuntu@52.24.133.64:/mnt/data/basespace/220928_A01255_0176_AHWVMVDSX2/Host/Host-ContrivedSamples/contrived_samples/ NovaSeq-09-28-2022_HostDepletion-contrived/
- 
-scp -r -i /mnt/data/basespace/jumpcode-bifx.pem ubuntu@52.24.133.64:/mnt/data/basespace/220928_A01255_0176_AHWVMVDSX2/Host/Host-ContrivedSamples/exo_stability_improvement/ NovaSeq-09-28-2022_HostDepletion-contrived/
- 
- 
-•	Aws:
-•	Moving things from AWS to any instance for example
-•	First open a tmux session, then run this command in it and then untar the folder, eg: tar -xvf stanPool_NE092-93_TimenTemp.tar (do that in a tmux session)
-•	aws s3 cp path_to_file_to_be_moved path_to_destination --recursive
+```
+
+•	htop:
+
+Check if anyone else is running any processes.
+
+•	scp:
+
+Moving from the server to local:
+```bash
+scp -i path_pem_file ubuntu@instance_ip:path_file_to_be_moved path_to_destination renaming_file_to_be_moved
+```
+Example: scp -i jumpcode-bifx.pem ubuntu@52.24.133.64:/path/to/protein-coding-genes.gtf ./
+
+Moving from local to server:
+```bash
+scp -i path_pem_file path_file_to_be_moved ubuntu@instance_ip:path_to_destination
+```
+Example: scp -i sridhar-jumpcode.pem /path/to/protein-coding-genes.gtf ubuntu@13.52.190.191:/path/to/protein-coding-genes.gtf
+
+Moving files between 2 instances:
+```bash
+scp -i path_pem_file ubuntu@instance_ip:file_to_be_moved path_to_destination
+```
+Example: scp -i sridhar-jumpcode.pem  ubuntu@13.52.50.144:/path/to/guide_count_metrics.txt ./
+Example from 144 to 64 instance: (run this command on 64 instance)
+scp -i sridhar-jumpcode.pem _(pem key of 144)_ ubuntu@13.52.50.144:/path/to/non_ALU_coverage.txt /path/to/non_clinical/
+  
+•	aws:
+
+Moving things from AWS to any instance:
+
+First open a tmux session, then run this command in it and then untar the folder, eg: tar -xvf stanPool_NE092-93_TimenTemp.tar (do that in a tmux session)
+```bash
+aws s3 cp path_to_file_to_be_moved path_to_destination --recursive
+```
 Example: aws s3 cp s3://jumpcodegenomics-public/refGenomes/hg38.protein-coding-ensembl.gtf . --recursive
-	Moving from any instance to AWS
-	aws s3 cp NE160/ s3://jumpcodegenomics-dropbox/bioinfx/project_archive/2023/QC_Experiments/NE160/ --recursive
- 
-•	Bs:
-•	To view a list of projects from wet lab
-•	bs project list (as an example, I can use the wet lab “MS076” folder)
-•	To download all fastq files to be used in running the depletion pipeline for instance 
-•	bs download project -n project_name_from_wetlab -o /mnt/data/basespace/MS076 
-•	ls -l /mnt/data/basespace/MS076/
-•	Tar
-•	To unzip tar.bza2 file
-•	tar -xvf trimmomatic-0.39-hdfd78af_2.tar.bz2
- 
-•	Bcl
-	/mnt/data/build/tools/bclconvert/bin/bcl-convert --bcl-input-directory 220708_A01255_0153_AHVHT5DSX2/ --sample-sheet SampleSheet-for-host-depletion-NovaSeq-SP-Demux.csv  --output-directory /mnt/data/basespace/host-depletion-scripps-07-13-2022  --no-lane-splitting true
- 
-•	Command download data: parallel downloading of files from a remote data platform
-•	dx ls | parallel -j 100 'dx download {}'
- 
-•	Split fasta sequence in different files
-Install fasta-splitter: conda install -c bioconda fasta-splitter to split the 20kb bins into individual file
- 
- 
-•	Demultiplexing command:
-bcl-convert --bcl-input-directory /mnt/data/basespace/221108_A01255_0185_AHYHN7DRX2/221108_A01255_0185_AHYHN7DRX2/ --sample-sheet Samplesheet-HD-NovaSeq-Demux-S1-110922.csv --output-directory /mnt/data/basespace/221108_A01255_0185_AHYHN7DRX2/Fastqs --no-lane-splitting false
- 
-Installing BCL Convert 
+
+Moving from any instance to AWS
+```bash
+aws s3 cp NE160/ s3://jumpcodegenomics-dropbox/bioinfx/project_archive/2023/QC_Experiments/NE160/ --recursive
+```
+
+•	bs:
+
+To view a list of projects from wet lab:
+```bash
+bs project list (as an example, I can use the wet lab “MS076” folder)
+```
+
+To download all fastq files for instance 
+```bash
+bs download project -n project_name_from_wetlab -o /path/to/fastq_folder 
+ls -l /path/to/fastq_folder
+```
+
+•	tar
+
+To unzip tar.bza2 file:
+```bash
+tar -xvf trimmomatic-0.39-hdfd78af_2.tar.bz2
+```
+
+•	bcl
+
+```bash
+/path/to/bcl-convert --bcl-input-directory 220708_A01255_0153_AHVHT5DSX2/ --sample-sheet SampleSheet.csv --output-directory /path/to/out --no-lane-splitting true
+```
+
+Installing BCL Convert:
+```bash 
 sudo apt-get install alien 
 sudo alien --to-deb bcl-convert-4.0.3-2.el7.x86_64.rpm 
 sudo dpkg -i bcl-convert_4.0.3-3_amd64.deb
-
-
-Data Archiving Utility
-### Archive and Upload to S3
-
-This utility script is used to compress a project folder, generate a checksum, and upload the archived data to an AWS S3 bucket for long-term storage.
-
-It ensures:
-- Data reproducibility through MD5 checksum tracking
-- Standardized project archiving structure
-- Efficient transfer to cloud storage
-
-#### Usage
-
-```bash
-bash scripts/archive_to_s3.sh <folder_name>
 ```
-Output
-.tar archive of the folder
-.md5sum checksum file
-Upload to S3 under year-based directory structure
-Requirements
-AWS CLI configured (aws configure)
-Write access to S3 bucket
 
+•	dx
 
-
-Samtools view bam |wc -l -> give the total number of aligned reads
-And 
-Samtools view bam | grep "chromosome name"|wc -l  -> give the total number of aligned reads for this particular chromosome
-
-
-multiqc
-
-	•	Create a fastqc output folder
-mkdir fastqc_out
-	•	Run fastqc on fastqs
-fastqc -o fastqc_out -t 6 *.gz
-	•	Run multiqc inside the fastq folder 
-multiqc -o output_folder input_folder
-[when u run multiqc on fastp files the input folder is where the html files are and not filtered folder]
-
-
+Parallel downloading of files from a remote data platform
+```bash
+dx ls | parallel -j 100 'dx download {}'
+```
  
-fastp
+•	Split fasta sequence in different files
+
+Install fasta-splitter: conda install -c bioconda fasta-splitter to split the 20kb bins into individual file
+
+•	samtools
+
+To get the total number of aligned reads:
+```bash
+samtools view bam | wc -l
+```
+
+To get the total number of aligned reads for this particular chromosome:
+```bash
+samtools view bam | grep "chromosome name" | wc -l 
+```
+
+To get primary alignments from bam files:
+```bash
+ls *.bam | parallel -j 4 'bam={} file=${bam%.bam}.bam; samtools view -@20 -b -f 3 -F 2816 $bam > primary_alignments/$file'
+```
+
+•	multiqc
+
+First, create a fastqc output folder:
+```bash
+mkdir fastqc_out
+```
+Run fastqc on fastqs
+```bash
+fastqc -o fastqc_out -t 6 *.gz
+```
+Run multiqc inside the fastq folder 
+```bash
+multiqc -o output_folder input_folder
+```
+Note: When you run multiqc on fastp files, the input folder is where the html files are and not filtered folder.
+
+•	bedtools
+
+To get genome coverage from the bam files: 
+```bash
+ls *.bam | parallel -j 20 'in={} out=${in%.bam}_genome_coverage_max.txt; bedtools genomecov -ibam $in  > max_cov_human/$out && echo "Completed genome coverage for file "$in'
+```
+
+•	fastp
+```bash
 ls *_R1_001.fastq.gz | parallel -j 5 'R1={} \
   R2=${R1%_R1_001.fastq.gz}_R2_001.fastq.gz \
   H=${R1%_R1_001.fastq.gz}_fastp.html \
@@ -300,11 +355,31 @@ ls *_R1_001.fastq.gz | parallel -j 5 'R1={} \
   --out1 filtered/$R1 --out2 filtered/$R2 \
   --verbose --detect_adapter_for_pe --length_required 99 \
   --html $H --json $J && echo "Completed quality filtering for $H"';
+```
+  
+---
 
+# Archive and Upload data to S3
 
-get primary alignments from bam files
-ls *.bam | parallel -j 4 'bam={} file=${bam%.bam}.bam; samtools view -@20 -b -f 3 -F 2816 $bam > primary_alignments/$file'
+This utility script is used to compress a project folder, generate a checksum, and upload the archived data to an AWS S3 bucket for long-term storage.
 
+It ensures:
+- Data reproducibility through MD5 checksum tracking
+- Standardized project archiving structure
+- Efficient transfer to cloud storage
 
-coverage task 
-ls *.bam | parallel -j 20 'in={} out=${in%.bam}_genome_coverage_max.txt; bedtools genomecov -ibam $in  > max_cov_human/$out && echo "Completed genome coverage for file "$in'
+## Usage
+
+```bash
+bash scripts/archive_to_s3.sh <folder_name>
+```
+
+## Output
+- .tar archive of the folder
+- .md5sum checksum file
+
+You will need to upload to S3 under year-based directory structure.
+
+Requirements:
+- AWS CLI configured (aws configure)
+- Write access to S3 bucket
