@@ -226,6 +226,12 @@ ls *.fastq.gz | parallel -j 4 'gunzip {}'
 
 Check if anyone else is running any processes.
 
+•	ssh:
+Connect to the server through ssh
+```bash
+ssh -i path_pem_file ubuntu@instance_ip
+```
+
 •	scp:
 
 Moving from the server to local:
@@ -285,6 +291,7 @@ tar -xvf trimmomatic-0.39-hdfd78af_2.tar.bz2
 
 •	bcl
 
+To perform demultiplexing:
 ```bash
 /path/to/bcl-convert --bcl-input-directory 220708_A01255_0153_AHVHT5DSX2/ --sample-sheet SampleSheet.csv --output-directory /path/to/out --no-lane-splitting true
 ```
