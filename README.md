@@ -243,6 +243,7 @@ ssh -i path_pem_file ubuntu@instance_ip
 Moving from the server to local:
 ```bash
 scp -i path_pem_file ubuntu@instance_ip:path_file_to_be_moved path_to_destination renaming_file_to_be_moved
+scp -r <username>@<hpc-server>:/path/to/file ./
 ```
 Example: scp -i jumpcode-bifx.pem ubuntu@52.24.133.64:/path/to/protein-coding-genes.gtf ./
 
@@ -290,9 +291,15 @@ ls -l /path/to/fastq_folder
 
 •	tar
 
-To unzip tar.bza2 file:
+To unzip tar.bz2 file:
 ```bash
 tar -xvf trimmomatic-0.39-hdfd78af_2.tar.bz2
+```
+
+To zip a bunch of files:
+```bash
+# tar
+tar -zcvf <archive_name>.tar.gz <files> 
 ```
 
 •	bcl
