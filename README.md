@@ -41,7 +41,7 @@ ls -l | awk '{print $9}' | grep ".gz" | wc -l
 
 ---
 
-# Count Biological Samples
+# Count Biological Samples in bulk RNA-seq experiment
 
 Assumes paired-end sequencing data where each sample contains an R1 and R2 FASTQ file.
 
