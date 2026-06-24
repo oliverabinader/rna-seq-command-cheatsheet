@@ -283,10 +283,16 @@ To view a list of projects from wet lab:
 bs project list (as an example, I can use the wet lab “MS076” folder)
 ```
 
-To download all fastq files for instance 
+To download all files for instance 
 ```bash
 bs download project -n project_name_from_wetlab -o /path/to/fastq_folder 
 ls -l /path/to/fastq_folder
+```
+
+To move the fastQ files to a new folder:
+```bash
+mkdir fastQ
+mv fastq_folder*/* fastQ/
 ```
 
 •	tar
