@@ -432,6 +432,8 @@ done < fastqs.txt >> md5_verification.txt
 •    The script *scripts/download_sra_fastq.sh* downloads sequencing FASTQ files from NCBI Sequence Read Archive (SRA) accession IDs using SRA Toolkit for downstream RNA-seq analysis.
 
 •    *Aspera FASTQ Upload (`scripts/upload_fastq_aspera.sh`)*: Transfers compressed FASTQ files (`*.fastq.gz`) to the NCBI dbGaP controlled-access repository using IBM Aspera (`ascp`) for secure, high-speed data submission.
+- The Aspera CLI must be installed and configured before running the upload script.
+- Data transfer was executed from a designated transfer node configured for large file uploads.
 
 ---
 
