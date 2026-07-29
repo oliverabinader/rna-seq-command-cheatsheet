@@ -260,7 +260,15 @@ scp -i path_pem_file ubuntu@instance_ip:file_to_be_moved path_to_destination
 Example: scp -i sridhar-jumpcode.pem  ubuntu@13.52.50.144:/path/to/guide_count_metrics.txt ./
 Example from 144 to 64 instance: (run this command on 64 instance)
 scp -i sridhar-jumpcode.pem _(pem key of 144)_ ubuntu@13.52.50.144:/path/to/non_ALU_coverage.txt /path/to/non_clinical/
-  
+
+Moving data from an outside source:
+```text
+Option 1: One can open Filezilla application and transfer data to shared drive.
+
+Option 2: Open command prompt, and login using your credentials, then perform the transfer. Note that you will need to enter the password. 
+Command: scp -r your_username@sftp.genewiz.com:/path/to/directory "/path/to/destination"
+```
+
 •	aws:
 
 Moving things from AWS to any instance:
@@ -405,7 +413,22 @@ ls *_R1_001.fastq.gz | parallel -j 5 'R1={} \
   --verbose --detect_adapter_for_pe --length_required 99 \
   --html $H --json $J && echo "Completed quality filtering for $H"';
 ```
-  
+
+•	md5sum
+```bash
+while read -r f; do
+    var1=$(md5sum "$f" | cut -f1 -d' ')
+    var2=$(cat "${f}.md5" | cut -f1 -d' ')
+
+    if [ "$var1" == "$var2" ]; then
+        echo "FASTQ $var1 is equal to md5 $var2"
+    else
+        echo "FASTQ $var1 is not equal to md5 $var2"
+    fi
+
+done < fastqs.txt >> md5_verification.txt
+```
+
 ---
 
 # Archive and Upload data to S3
